@@ -12,10 +12,10 @@ func Flip(flg string, dflt interface{}, newFtr interface{}, iargs ...interface{}
 	var ptr interface{}
 
 	if IsActive(flg) {
-		ptr = dflt
+		ptr = newFtr
 
 	} else {
-		ptr = newFtr
+		ptr = dflt
 	}
 	cr = reflect.ValueOf(ptr).Call(args)
 
@@ -25,14 +25,15 @@ func Flip(flg string, dflt interface{}, newFtr interface{}, iargs ...interface{}
 	return
 }
 
-func IsActive(flg) (active bool) {
+func IsActive(flg string) (active bool) {
 
-	if _, exists := featureList[flg]; !exists {
+	if feature, exists := featureList[flg]; !exists || feature.status == FEATURE_OFF {
 		active = false
 
 	} else {
-
+		active = true
 	}
+	return
 }
 
 type feature struct {
@@ -48,14 +49,20 @@ const (
 	FEATURE_FILTER
 )
 
-var featureList []feature
+var featureList map[string]feature
+var namespace string
+
+func Init(ns string) {
+	featureList = make(map[string]feature)
+	namespace = ns
+}
 
 func RegisterFeature(featureSignature string) {
 
-	if _, exists := featureList[flg]; !exists {
-		featureList = append(featureList, feature{
+	if _, exists := featureList[featureSignature]; !exists {
+		featureList[featureSignature] = feature{
 			name:   featureSignature,
 			status: FEATURE_OFF,
-		})
+		}
 	}
 }
