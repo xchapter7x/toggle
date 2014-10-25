@@ -57,6 +57,10 @@ func Init(ns string) {
 	namespace = ns
 }
 
+func ShowFeatures() map[string]feature {
+	return featureList
+}
+
 func RegisterFeature(featureSignature string) {
 
 	if _, exists := featureList[featureSignature]; !exists {
