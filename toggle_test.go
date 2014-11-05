@@ -98,6 +98,18 @@ var _ = Describe("toggle package", func() {
 			response := toggle.IsActive(flagName)
 			Expect(response).To(Equal(true))
 		})
+
+		It("Should return a non nil error if flagName not valid", func() {
+			response := toggle.SetFeatureStatus(flagName, toggle.FEATURE_ON)
+			Ω(response).ShouldNot(BeNil())
+		})
+
+		It("Should return a nil error if flagName is valid", func() {
+			toggle.RegisterFeature(flagName)
+			response := toggle.SetFeatureStatus(flagName, toggle.FEATURE_ON)
+			Ω(response).Should(BeNil())
+		})
+
 	})
 
 	Describe("Flip function", func() {
