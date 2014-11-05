@@ -20,7 +20,7 @@ func TestB(s string) (r string) {
 }
 
 func main() {
-	toggle.Init("MAINTEST")
+	toggle.Init("MAINTEST", nil)
 	toggle.RegisterFeature("test")
 	f := toggle.Flip("test", TestA, TestB, "argstring")
 	var output string
