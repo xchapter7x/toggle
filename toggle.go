@@ -1,32 +1,53 @@
 package toggle
 
-import "reflect"
+import (
+	"fmt"
+	"reflect"
+)
 
-func Flip(flg string, dflt interface{}, newFtr interface{}, iargs ...interface{}) (r []interface{}) {
-	var cr []reflect.Value
-	var args []reflect.Value
-
+func createReflectValueArgsArray(iargs []interface{}) (args []reflect.Value) {
 	for _, arg := range iargs {
 		args = append(args, reflect.ValueOf(arg))
 	}
-	var ptr interface{}
+	return
+}
 
+func createInterfaceArrayFromValuesArray(responseValuesArray []reflect.Value) (responseInterfaceArray []interface{}) {
+	for _, ri := range responseValuesArray {
+		responseInterfaceArray = append(responseInterfaceArray, ri.Interface())
+	}
+	return
+}
+
+func getActivePointer(flg string, defaultFeature, newFeature interface{}) (activePointer interface{}) {
 	if IsActive(flg) {
-		ptr = newFtr
+		activePointer = newFeature
 
 	} else {
-		ptr = dflt
+		activePointer = defaultFeature
 	}
-	cr = reflect.ValueOf(ptr).Call(args)
+	return
+}
 
-	for _, ri := range cr {
-		r = append(r, ri.Interface())
+func Flip(flg string, defaultFeature, newFeature interface{}, iargs ...interface{}) (responseInterfaceArray []interface{}) {
+	args := createReflectValueArgsArray(iargs)
+	ptr := getActivePointer(flg, defaultFeature, newFeature)
+	responseValuesArray := reflect.ValueOf(ptr).Call(args)
+	responseInterfaceArray = createInterfaceArrayFromValuesArray(responseValuesArray)
+	return
+}
+
+func SetFeatureStatus(featureName string, featureStatus int) (err error) {
+	if _, exists := featureList[featureName]; exists {
+		featureList[featureName].status = featureStatus
+
+	} else {
+		err = fmt.Errorf("Feature toggle doesnt exist")
 	}
 	return
 }
 
 func IsActive(flg string) (active bool) {
-
 	if feature, exists := featureList[flg]; !exists || feature.status == FEATURE_OFF {
 		active = false
 
@@ -49,22 +70,22 @@ const (
 	FEATURE_FILTER
 )
 
-var featureList map[string]feature
+var featureList map[string]*feature
 var namespace string
 
 func Init(ns string) {
-	featureList = make(map[string]feature)
+	featureList = make(map[string]*feature)
 	namespace = ns
 }
 
-func ShowFeatures() map[string]feature {
+func ShowFeatures() map[string]*feature {
 	return featureList
 }
 
 func RegisterFeature(featureSignature string) {
 
 	if _, exists := featureList[featureSignature]; !exists {
-		featureList[featureSignature] = feature{
+		featureList[featureSignature] = &feature{
 			name:   featureSignature,
 			status: FEATURE_OFF,
 		}

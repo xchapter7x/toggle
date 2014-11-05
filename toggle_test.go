@@ -42,4 +42,67 @@ var _ = Describe("toggle package", func() {
 		})
 
 	})
+
+	Describe("IsActive function", func() {
+		flagName := "bogusFlag"
+
+		It("Should return false if given unregistered flag", func() {
+			response := toggle.IsActive(flagName)
+			Expect(response).To(Equal(false))
+		})
+
+		It("Should return false if given flag that is FEATURE_OFF status ", func() {
+			toggle.RegisterFeature(flagName)
+			toggle.SetFeatureStatus(flagName, toggle.FEATURE_OFF)
+			response := toggle.IsActive(flagName)
+			Expect(response).To(Equal(false))
+		})
+
+		It("Should return true if given flag that is FEATURE_ON status ", func() {
+			toggle.RegisterFeature(flagName)
+			toggle.SetFeatureStatus(flagName, toggle.FEATURE_ON)
+			response := toggle.IsActive(flagName)
+			Expect(response).To(Equal(true))
+		})
+	})
+
+	Describe("SetFeatureStatus function", func() {
+		flagName := "bogusFlag"
+
+		It("Should return false if setting FEATURE_OFF status from default", func() {
+			toggle.RegisterFeature(flagName)
+			toggle.SetFeatureStatus(flagName, toggle.FEATURE_OFF)
+			response := toggle.IsActive(flagName)
+			Expect(response).To(Equal(false))
+		})
+
+		It("Should return true if setting FEATURE_ON status from default", func() {
+			toggle.RegisterFeature(flagName)
+			toggle.SetFeatureStatus(flagName, toggle.FEATURE_ON)
+			response := toggle.IsActive(flagName)
+			Expect(response).To(Equal(true))
+		})
+
+		It("Should return false if setting FEATURE_OFF status updating existing value", func() {
+			toggle.RegisterFeature(flagName)
+			toggle.SetFeatureStatus(flagName, toggle.FEATURE_ON)
+			toggle.SetFeatureStatus(flagName, toggle.FEATURE_OFF)
+			response := toggle.IsActive(flagName)
+			Expect(response).To(Equal(false))
+		})
+
+		It("Should return true if setting FEATURE_ON status updating existing value", func() {
+			toggle.RegisterFeature(flagName)
+			toggle.SetFeatureStatus(flagName, toggle.FEATURE_OFF)
+			toggle.SetFeatureStatus(flagName, toggle.FEATURE_ON)
+			response := toggle.IsActive(flagName)
+			Expect(response).To(Equal(true))
+		})
+	})
+
+	Describe("Flip function", func() {
+		It("Should select the default feature function to run when flag is inactive", func() {
+			Expect(true).To(Equal(false))
+		})
+	})
 })
