@@ -101,8 +101,33 @@ var _ = Describe("toggle package", func() {
 	})
 
 	Describe("Flip function", func() {
+		flagName := "bogusFlag"
+
 		It("Should select the default feature function to run when flag is inactive", func() {
-			Expect(true).To(Equal(false))
+			toggle.RegisterFeature(flagName)
+			status := ""
+			controlDefault := "default"
+			controlNew := "new"
+			toggle.Flip(flagName, func() {
+				status = controlDefault
+			}, func() {
+				status = controlNew
+			})
+			Expect(status).To(Equal(controlDefault))
+		})
+
+		It("Should select the new feature function to run when flag is set to active", func() {
+			toggle.RegisterFeature(flagName)
+			toggle.SetFeatureStatus(flagName, toggle.FEATURE_ON)
+			status := ""
+			controlDefault := "default"
+			controlNew := "new"
+			toggle.Flip(flagName, func() {
+				status = controlDefault
+			}, func() {
+				status = controlNew
+			})
+			Expect(status).To(Equal(controlNew))
 		})
 	})
 })
