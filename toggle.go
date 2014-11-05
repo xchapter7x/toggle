@@ -72,9 +72,11 @@ const (
 
 var featureList map[string]*feature
 var namespace string
+var toggleEngine storageEngine
 
-func Init(ns string) {
+func Init(ns string, engine storageEngine) {
 	featureList = make(map[string]*feature)
+	toggleEngine = engine
 	namespace = ns
 }
 

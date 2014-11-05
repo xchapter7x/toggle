@@ -10,7 +10,7 @@ var _ = Describe("toggle package", func() {
 	controlNamespace := "hi"
 
 	BeforeEach(func() {
-		toggle.Init(controlNamespace)
+		toggle.Init(controlNamespace, nil)
 	})
 
 	Describe("RegisterFeature Function", func() {
