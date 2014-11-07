@@ -117,6 +117,52 @@ var _ = Describe("toggle package", func() {
 		controlDefault := "default"
 		controlNew := "new"
 
+		It("Should take arguments and pass them into the selected function", func() {
+			toggle.RegisterFeature(flagName)
+			status := ""
+			toggle.Flip(flagName, func(arg1 string) {
+				status = arg1
+			}, func(arg1 string) {
+				status = arg1
+			}, controlDefault)
+			Expect(status).To(Equal(controlDefault))
+		})
+
+		It("Should return arguments from the flip function in the form of an interface array", func() {
+			toggle.RegisterFeature(flagName)
+			status := ""
+			var response []interface{}
+			argumentCount := 1
+			controlLen := len(response) + argumentCount
+			response = toggle.Flip(flagName, func() (r string) {
+				status = controlDefault
+				return status
+			}, func() (r string) {
+				status = controlNew
+				return status
+			})
+			Expect(len(response)).To(Equal(controlLen))
+			Expect(response[0]).To(Equal(status))
+		})
+
+		It("Should return arguments from the flip function in the form of an interface array when multiple response values", func() {
+			toggle.RegisterFeature(flagName)
+			status := ""
+			var response []interface{}
+			argumentCount := 2
+			controlLen := len(response) + argumentCount
+			response = toggle.Flip(flagName, func() (r, j string) {
+				status = controlDefault
+				return status, status
+			}, func() (r, j string) {
+				status = controlNew
+				return status, status
+			})
+			Expect(len(response)).To(Equal(controlLen))
+			Expect(response[0]).To(Equal(status))
+			Expect(response[1]).To(Equal(status))
+		})
+
 		It("Should select the default feature function to run when flag is default", func() {
 			toggle.RegisterFeature(flagName)
 			status := ""
