@@ -90,22 +90,30 @@ func ShowFeatures() map[string]*feature {
 	return featureList
 }
 
-func getFeatureStatusValue(featureSignature string) (status string) {
+func getFeatureStatusValue(featureSignature, statusValue string) (status string) {
 	//if status = os.Getenv(featureSignature); status == "" {
 	var err error
 
 	if status, err = toggleEngine.GetFeatureStatusValue(featureSignature); err != nil {
-		status = FEATURE_OFF
+		status = statusValue
 	}
 	return
 }
 
-func RegisterFeature(featureSignature string) {
+func RegisterFeature(featureSignature string) (err error) {
+	err = RegisterFeatureWithStatus(featureSignature, FEATURE_OFF)
+	return
+}
 
+func RegisterFeatureWithStatus(featureSignature, statusValue string) (err error) {
 	if _, exists := featureList[featureSignature]; !exists {
 		featureList[featureSignature] = &feature{
 			name:   featureSignature,
-			status: getFeatureStatusValue(featureSignature),
+			status: getFeatureStatusValue(featureSignature, statusValue),
 		}
+
+	} else {
+		err = fmt.Errorf("feature already registered")
 	}
+	return
 }

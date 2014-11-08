@@ -14,12 +14,13 @@ var _ = Describe("toggle package", func() {
 	})
 
 	Describe("RegisterFeature Function", func() {
-		It("Should inject a new feature", func() {
+		It("Should inject a new feature and return nil error", func() {
 			initialFeatureCount := len(toggle.ShowFeatures())
 			featureName := "sampleFeature"
-			toggle.RegisterFeature(featureName)
+			err := toggle.RegisterFeature(featureName)
 			currentFeatureCount := len(toggle.ShowFeatures())
 			Expect(initialFeatureCount).NotTo(Equal(currentFeatureCount))
+			Ω(err).Should(BeNil())
 		})
 
 		It("Should add feature record for referencing", func() {
@@ -32,13 +33,14 @@ var _ = Describe("toggle package", func() {
 			Expect(controlExists).NotTo(Equal(currentExists))
 		})
 
-		It("Should ignore duplicate register calls", func() {
+		It("Should ignore duplicate register calls and return non nil error", func() {
 			featureName := "sampleFeature"
 			toggle.RegisterFeature(featureName)
 			initialFeatureCount := len(toggle.ShowFeatures())
-			toggle.RegisterFeature(featureName)
+			err := toggle.RegisterFeature(featureName)
 			currentFeatureCount := len(toggle.ShowFeatures())
 			Expect(initialFeatureCount).To(Equal(currentFeatureCount))
+			Ω(err).ShouldNot(BeNil())
 		})
 
 	})
