@@ -91,7 +91,6 @@ func ShowFeatures() map[string]*feature {
 }
 
 func getFeatureStatusValue(featureSignature, statusValue string) (status string) {
-	//if status = os.Getenv(featureSignature); status == "" {
 	var err error
 
 	if status, err = toggleEngine.GetFeatureStatusValue(featureSignature); err != nil {
