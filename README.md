@@ -1,6 +1,7 @@
 toggle
 ======
 
+[![wercker status](https://app.wercker.com/status/9c11e691895a9782a234fcc9bb313819/m "wercker status")](https://app.wercker.com/project/bykey/9c11e691895a9782a234fcc9bb313819)
 
 Sample usage:
 (./sample/main.go)
