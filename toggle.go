@@ -37,7 +37,7 @@ func Flip(flg string, defaultFeature, newFeature interface{}, iargs ...interface
 	return
 }
 
-func SetFeatureStatus(featureName string, featureStatus int) (err error) {
+func SetFeatureStatus(featureName, featureStatus string) (err error) {
 	if _, exists := featureList[featureName]; exists {
 		featureList[featureName].status = featureStatus
 
@@ -59,15 +59,15 @@ func IsActive(flg string) (active bool) {
 
 type feature struct {
 	name     string
-	status   int
+	status   string
 	filter   func(...interface{}) bool
 	settings map[string]interface{}
 }
 
 const (
-	FEATURE_ON = iota
-	FEATURE_OFF
-	FEATURE_FILTER
+	FEATURE_ON     = "true"
+	FEATURE_OFF    = "false"
+	FEATURE_FILTER = "filter:x:x"
 )
 
 var featureList map[string]*feature
@@ -76,12 +76,28 @@ var toggleEngine storageEngine
 
 func Init(ns string, engine storageEngine) {
 	featureList = make(map[string]*feature)
-	toggleEngine = engine
 	namespace = ns
+
+	if engine != nil {
+		toggleEngine = engine
+
+	} else {
+		toggleEngine = NewDefaultEngine()
+	}
 }
 
 func ShowFeatures() map[string]*feature {
 	return featureList
+}
+
+func getFeatureStatusValue(featureSignature string) (status string) {
+	//if status = os.Getenv(featureSignature); status == "" {
+	var err error
+
+	if status, err = toggleEngine.GetFeatureStatusValue(featureSignature); err != nil {
+		status = FEATURE_OFF
+	}
+	return
 }
 
 func RegisterFeature(featureSignature string) {
@@ -89,7 +105,7 @@ func RegisterFeature(featureSignature string) {
 	if _, exists := featureList[featureSignature]; !exists {
 		featureList[featureSignature] = &feature{
 			name:   featureSignature,
-			status: FEATURE_OFF,
+			status: getFeatureStatusValue(featureSignature),
 		}
 	}
 }
