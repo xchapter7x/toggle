@@ -14,7 +14,9 @@ func **Init**(ns string, engine storageEngine)
 
 func **ShowFeatures**() map[string]*feature
 
-func **RegisterFeature**(featureSignature string)
+func **RegisterFeature**(featureSignature string) (err error)
+
+func **RegisterFeatureWithStatus**(featureSignature, statusValue string) (err error)
 
 func **NewDefaultEngine**() (engine storageEngine)
 
