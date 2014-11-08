@@ -38,8 +38,16 @@ func main() {
 ```
 
 
+```
+$ test=true go run sample/main.go
+testb argstring
 
-$ go run ./sample/main.go
+testb argstring
 
 
-$ test=true go run ./sample/main.go
+
+$ go run sample/main.go
+testa argstring
+
+testa argstring
+```
