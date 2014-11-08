@@ -3,6 +3,28 @@ toggle
 
 [![wercker status](https://app.wercker.com/status/9c11e691895a9782a234fcc9bb313819/m "wercker status")](https://app.wercker.com/project/bykey/9c11e691895a9782a234fcc9bb313819)
 
+
+func **Flip**(flg string, defaultFeature, newFeature interface{}, iargs ...interface{}) (responseInterfaceArray []interface{})
+
+func **SetFeatureStatus**(featureName, featureStatus string) (err error)
+
+func **IsActive**(flg string) (active bool)
+
+func **Init**(ns string, engine storageEngine)
+
+func **ShowFeatures**() map[string]*feature
+
+func **RegisterFeature**(featureSignature string)
+
+func **NewDefaultEngine**() (engine storageEngine)
+
+
+
+type **DefaultEngine** struct
+
+func (s \*DefaultEngine) **GetFeatureStatusValue**(featureSignature string) (status string, err error)
+
+
 Sample usage:
 (./sample/main.go)
 ```
