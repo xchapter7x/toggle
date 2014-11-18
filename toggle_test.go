@@ -29,7 +29,7 @@ var _ = Describe("toggle package", func() {
 			_, controlExists := initialFeatureList[featureName]
 			toggle.RegisterFeature(featureName)
 			currentFeatureList := toggle.ShowFeatures()
-			_, currentExists := currentFeatureList[featureName]
+			_, currentExists := currentFeatureList[toggle.GetFullFeatureSignature(featureName)]
 			Expect(controlExists).NotTo(Equal(currentExists))
 		})
 

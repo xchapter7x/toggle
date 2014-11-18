@@ -37,9 +37,11 @@ func Flip(flg string, defaultFeature, newFeature interface{}, iargs ...interface
 	return
 }
 
-func SetFeatureStatus(featureName, featureStatus string) (err error) {
-	if _, exists := featureList[featureName]; exists {
-		featureList[featureName].status = featureStatus
+func SetFeatureStatus(featureSignature, featureStatus string) (err error) {
+	fullSignature := GetFullFeatureSignature(featureSignature)
+
+	if _, exists := featureList[fullSignature]; exists {
+		featureList[fullSignature].status = featureStatus
 
 	} else {
 		err = fmt.Errorf("Feature toggle doesnt exist")
@@ -47,8 +49,10 @@ func SetFeatureStatus(featureName, featureStatus string) (err error) {
 	return
 }
 
-func IsActive(flg string) (active bool) {
-	if feature, exists := featureList[flg]; !exists || feature.status == FEATURE_OFF {
+func IsActive(featureSignature string) (active bool) {
+	fullSignature := GetFullFeatureSignature(featureSignature)
+
+	if feature, exists := featureList[fullSignature]; !exists || feature.status == FEATURE_OFF {
 		active = false
 
 	} else {
@@ -104,11 +108,18 @@ func RegisterFeature(featureSignature string) (err error) {
 	return
 }
 
+func GetFullFeatureSignature(partialSignature string) (fullSignature string) {
+	fullSignature = fmt.Sprintf("%s_%s", namespace, partialSignature)
+	return
+}
+
 func RegisterFeatureWithStatus(featureSignature, statusValue string) (err error) {
-	if _, exists := featureList[featureSignature]; !exists {
-		featureList[featureSignature] = &feature{
-			name:   featureSignature,
-			status: getFeatureStatusValue(featureSignature, statusValue),
+	fullSignature := GetFullFeatureSignature(featureSignature)
+
+	if _, exists := featureList[fullSignature]; !exists {
+		featureList[fullSignature] = &feature{
+			name:   fullSignature,
+			status: getFeatureStatusValue(fullSignature, statusValue),
 		}
 
 	} else {
