@@ -5,7 +5,35 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/xchapter7x/toggle/engines/localengine"
 	"github.com/xchapter7x/toggle/engines/localpubsub"
+	"github.com/xchapter7x/toggle/engines/storageinterface"
 )
+
+type PubSubConnMock struct {
+}
+
+func (c PubSubConnMock) Close() (err error) {
+	return
+}
+
+func (c PubSubConnMock) Subscribe(channel ...interface{}) (err error) {
+	return
+}
+
+func (c PubSubConnMock) PSubscribe(channel ...interface{}) (err error) {
+	return
+}
+
+func (c PubSubConnMock) Unsubscribe(channel ...interface{}) (err error) {
+	return
+}
+
+func (c PubSubConnMock) PUnsubscribe(channel ...interface{}) (err error) {
+	return
+}
+
+func (c PubSubConnMock) Receive() (i interface{}) {
+	return
+}
 
 var controlSuccessStatus string = "true"
 
@@ -22,17 +50,27 @@ func failureGetenvMock(fs string) (status string) {
 var _ = Describe("localpubsub package", func() {
 	Describe("localpubsub struct", func() {
 		Describe("GetFeatureStatusValue function", func() {
-			localEngineSuccessMock := &localengine.LocalEngine{
-				Getenv: successGetenvMock,
-			}
+			var localEngineFailureMock, localEngineSuccessMock *localengine.LocalEngine
+			var engine storageinterface.StorageEngine
+			BeforeEach(func() {
+				localEngineSuccessMock = &localengine.LocalEngine{
+					Getenv: successGetenvMock,
+				}
 
-			localEngineFailureMock := &localengine.LocalEngine{
-				Getenv: failureGetenvMock,
-			}
+				localEngineFailureMock = &localengine.LocalEngine{
+					Getenv: failureGetenvMock,
+				}
+			})
 
+			AfterEach(func() {
+				localEngineFailureMock.Close()
+				localEngineSuccessMock.Close()
+				engine.Close()
+			})
 			It("Should return the result of getenv and have nil error on success", func() {
-				engine := &localpubsub.LocalPubSubEngine{
+				engine = &localpubsub.LocalPubSubEngine{
 					LocalEngine: localEngineSuccessMock,
+					PubSub:      &PubSubConnMock{},
 				}
 				res, err := engine.GetFeatureStatusValue("")
 				Expect(res).To(Equal(controlSuccessStatus))
@@ -40,8 +78,9 @@ var _ = Describe("localpubsub package", func() {
 			})
 
 			It("Should return non nil err on failed call", func() {
-				engine := &localpubsub.LocalPubSubEngine{
+				engine = &localpubsub.LocalPubSubEngine{
 					LocalEngine: localEngineFailureMock,
+					PubSub:      &PubSubConnMock{},
 				}
 				_, err := engine.GetFeatureStatusValue("")
 				Ω(err).ShouldNot(BeNil())

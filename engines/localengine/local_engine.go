@@ -26,3 +26,7 @@ func (s *LocalEngine) GetFeatureStatusValue(featureSignature string) (status str
 	}
 	return
 }
+
+func (s *LocalEngine) Close() (err error) {
+	return
+}

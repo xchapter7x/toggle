@@ -6,6 +6,14 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Rev": "2626010f7a6df5efe20db4686fc8806a5d41024e"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "2626010f7a6df5efe20db4686fc8806a5d41024e"
+		},
+		{
 			"ImportPath": "github.com/onsi/ginkgo",
 			"Comment": "v1.1.0-20-g75d0cd9",
 			"Rev": "75d0cd9c7ee52e99b13e6ccfd9e58b4f92b7795e"
