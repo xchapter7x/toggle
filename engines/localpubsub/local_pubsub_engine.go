@@ -37,11 +37,7 @@ func pubsubReciever(s *LocalPubSubEngine) {
 		switch n := s.PubSub.Receive().(type) {
 		case redis.Message:
 			fmt.Printf("Message: %s %s\n", n.Channel, n.Data)
-		case redis.Subscription:
-			fmt.Printf("Subscription: %s %s %d\n", n.Kind, n.Channel, n.Count)
-			if n.Count == 0 {
-				return
-			}
+
 		case error:
 			fmt.Printf("error: %v\n", n)
 			return
@@ -58,6 +54,7 @@ func (s *LocalPubSubEngine) StartSubscriptionListener() {
 				select {
 				case <-s.quit:
 					return
+
 				default:
 					pubsubReciever(s)
 				}
