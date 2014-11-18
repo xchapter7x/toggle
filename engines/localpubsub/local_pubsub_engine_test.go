@@ -5,7 +5,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/xchapter7x/toggle/engines/localengine"
 	"github.com/xchapter7x/toggle/engines/localpubsub"
-	"github.com/xchapter7x/toggle/engines/storageinterface"
 )
 
 type PubSubConnMock struct {
@@ -51,7 +50,8 @@ var _ = Describe("localpubsub package", func() {
 	Describe("localpubsub struct", func() {
 		Describe("GetFeatureStatusValue function", func() {
 			var localEngineFailureMock, localEngineSuccessMock *localengine.LocalEngine
-			var engine storageinterface.StorageEngine
+			var engine *localpubsub.LocalPubSubEngine
+
 			BeforeEach(func() {
 				localEngineSuccessMock = &localengine.LocalEngine{
 					Getenv: successGetenvMock,
@@ -72,6 +72,7 @@ var _ = Describe("localpubsub package", func() {
 					LocalEngine: localEngineSuccessMock,
 					PubSub:      &PubSubConnMock{},
 				}
+				engine.StartSubscriptionListener()
 				res, err := engine.GetFeatureStatusValue("")
 				Expect(res).To(Equal(controlSuccessStatus))
 				Ω(err).Should(BeNil())
@@ -82,6 +83,7 @@ var _ = Describe("localpubsub package", func() {
 					LocalEngine: localEngineFailureMock,
 					PubSub:      &PubSubConnMock{},
 				}
+				engine.StartSubscriptionListener()
 				_, err := engine.GetFeatureStatusValue("")
 				Ω(err).ShouldNot(BeNil())
 			})

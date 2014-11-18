@@ -9,15 +9,16 @@ import (
 	"github.com/xchapter7x/toggle/engines/storageinterface"
 )
 
-func NewLocalPubSubEngine(pubsub pubsubInterface) (engine storageinterface.StorageEngine) {
+func NewLocalPubSubEngine(pubsub pubsubInterface) storageinterface.StorageEngine {
 	le := &localengine.LocalEngine{
 		Getenv: os.Getenv,
 	}
-	engine = &LocalPubSubEngine{
+	engine := &LocalPubSubEngine{
 		LocalEngine: le,
 		PubSub:      pubsub,
 	}
-	return
+	engine.StartSubscriptionListener()
+	return engine
 }
 
 type LocalPubSubEngine struct {
@@ -48,23 +49,24 @@ func pubsubReciever(s *LocalPubSubEngine) {
 	}
 }
 
-func (s *LocalPubSubEngine) startListener() {
-	s.quit = make(chan bool)
+func (s *LocalPubSubEngine) StartSubscriptionListener() {
+	if s.quit == nil {
+		s.quit = make(chan bool)
 
-	go func() {
-		for {
-			select {
-			case <-s.quit:
-				return
-			default:
-				pubsubReciever(s)
+		go func() {
+			for {
+				select {
+				case <-s.quit:
+					return
+				default:
+					pubsubReciever(s)
+				}
 			}
-		}
-	}()
+		}()
+	}
 }
 
 func (s *LocalPubSubEngine) GetFeatureStatusValue(featureSignature string) (status string, err error) {
-	s.startListener()
 	s.PubSub.Subscribe(featureSignature)
 	status, err = s.LocalEngine.GetFeatureStatusValue(featureSignature)
 	return
