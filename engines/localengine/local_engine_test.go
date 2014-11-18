@@ -1,9 +1,9 @@
-package toggle_test
+package localengine_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/xchapter7x/toggle"
+	"github.com/xchapter7x/toggle/engines/localengine"
 )
 
 var controlSuccessStatus string = "true"
@@ -18,11 +18,11 @@ func failureGetenvMock(fs string) (status string) {
 	return
 }
 
-var _ = Describe("toggle package", func() {
-	Describe("defaultEngine struct", func() {
+var _ = Describe("localengine package", func() {
+	Describe("LocalEngine struct", func() {
 		Describe("GetFeatureStatusValue function", func() {
 			It("Should return the result of getenv and have nil error on success", func() {
-				engine := &toggle.DefaultEngine{
+				engine := &localengine.LocalEngine{
 					Getenv: successGetenvMock,
 				}
 				res, err := engine.GetFeatureStatusValue("")
@@ -31,7 +31,7 @@ var _ = Describe("toggle package", func() {
 			})
 
 			It("Should return non nil err on failed call", func() {
-				engine := &toggle.DefaultEngine{
+				engine := &localengine.LocalEngine{
 					Getenv: failureGetenvMock,
 				}
 				_, err := engine.GetFeatureStatusValue("")

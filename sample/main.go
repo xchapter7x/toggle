@@ -5,6 +5,7 @@ import (
 
 	"github.com/xchapter7x/goutil/unpack"
 	"github.com/xchapter7x/toggle"
+	"github.com/xchapter7x/toggle/engines/localengine"
 )
 
 func TestA(s string) (r string) {
@@ -20,7 +21,7 @@ func TestB(s string) (r string) {
 }
 
 func main() {
-	toggle.Init("NS", nil)
+	toggle.Init("NS", localengine.NewLocalEngine())
 	toggle.RegisterFeature("test")
 	f := toggle.Flip("test", TestA, TestB, "argstring")
 	var output string

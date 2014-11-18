@@ -3,6 +3,9 @@ package toggle
 import (
 	"fmt"
 	"reflect"
+
+	"github.com/xchapter7x/toggle/engines/localengine"
+	"github.com/xchapter7x/toggle/engines/storageinterface"
 )
 
 func createReflectValueArgsArray(iargs []interface{}) (args []reflect.Value) {
@@ -76,9 +79,9 @@ const (
 
 var featureList map[string]*feature
 var namespace string
-var toggleEngine storageEngine
+var toggleEngine storageinterface.StorageEngine
 
-func Init(ns string, engine storageEngine) {
+func Init(ns string, engine storageinterface.StorageEngine) {
 	featureList = make(map[string]*feature)
 	namespace = ns
 
@@ -86,7 +89,7 @@ func Init(ns string, engine storageEngine) {
 		toggleEngine = engine
 
 	} else {
-		toggleEngine = NewDefaultEngine()
+		toggleEngine = localengine.NewLocalEngine()
 	}
 }
 
