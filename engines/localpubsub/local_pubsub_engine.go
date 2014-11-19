@@ -1,10 +1,8 @@
 package localpubsub
 
 import (
-	"fmt"
 	"os"
 
-	"github.com/garyburd/redigo/redis"
 	"github.com/xchapter7x/toggle/engines/localengine"
 	"github.com/xchapter7x/toggle/engines/storageinterface"
 )
@@ -32,19 +30,6 @@ func (s *LocalPubSubEngine) Close() (err error) {
 	return
 }
 
-func pubsubReciever(s *LocalPubSubEngine) {
-	for {
-		switch n := s.PubSub.Receive().(type) {
-		case redis.Message:
-			fmt.Printf("Message: %s %s\n", n.Channel, n.Data)
-
-		case error:
-			fmt.Printf("error: %v\n", n)
-			return
-		}
-	}
-}
-
 func (s *LocalPubSubEngine) StartSubscriptionListener() {
 	if s.quit == nil {
 		s.quit = make(chan bool)
@@ -56,7 +41,7 @@ func (s *LocalPubSubEngine) StartSubscriptionListener() {
 					return
 
 				default:
-					pubsubReciever(s)
+					PubSubReceiver(s.PubSub)
 				}
 			}
 		}()

@@ -25,7 +25,7 @@ build:
     - script:
         name: go test cover
         code: |
-          ./testCoverage ./... 90
+          ./testCoverage ./... 50 
 
     # Test if the project builds
     - script:
