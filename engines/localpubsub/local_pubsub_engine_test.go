@@ -72,7 +72,7 @@ var _ = Describe("localpubsub package", func() {
 					LocalEngine: localEngineSuccessMock,
 					PubSub:      &PubSubConnMock{},
 				}
-				engine.StartSubscriptionListener()
+				engine.StartSubscriptionListener(nil)
 				res, err := engine.GetFeatureStatusValue("")
 				Expect(res).To(Equal(controlSuccessStatus))
 				Ω(err).Should(BeNil())
@@ -83,7 +83,7 @@ var _ = Describe("localpubsub package", func() {
 					LocalEngine: localEngineFailureMock,
 					PubSub:      &PubSubConnMock{},
 				}
-				engine.StartSubscriptionListener()
+				engine.StartSubscriptionListener(nil)
 				_, err := engine.GetFeatureStatusValue("")
 				Ω(err).ShouldNot(BeNil())
 			})

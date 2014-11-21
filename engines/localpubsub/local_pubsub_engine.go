@@ -3,11 +3,12 @@ package localpubsub
 import (
 	"os"
 
+	"github.com/xchapter7x/toggle"
 	"github.com/xchapter7x/toggle/engines/localengine"
 	"github.com/xchapter7x/toggle/engines/storageinterface"
 )
 
-func NewLocalPubSubEngine(pubsub pubsubInterface) storageinterface.StorageEngine {
+func NewLocalPubSubEngine(pubsub pubsubInterface, toggleList map[string]*toggle.Feature) storageinterface.StorageEngine {
 	le := &localengine.LocalEngine{
 		Getenv: os.Getenv,
 	}
@@ -15,7 +16,7 @@ func NewLocalPubSubEngine(pubsub pubsubInterface) storageinterface.StorageEngine
 		LocalEngine: le,
 		PubSub:      pubsub,
 	}
-	engine.StartSubscriptionListener()
+	engine.StartSubscriptionListener(toggleList)
 	return engine
 }
 
@@ -30,7 +31,7 @@ func (s *LocalPubSubEngine) Close() (err error) {
 	return
 }
 
-func (s *LocalPubSubEngine) StartSubscriptionListener() {
+func (s *LocalPubSubEngine) StartSubscriptionListener(toggleList map[string]*toggle.Feature) {
 	if s.quit == nil {
 		s.quit = make(chan bool)
 
@@ -41,7 +42,7 @@ func (s *LocalPubSubEngine) StartSubscriptionListener() {
 					return
 
 				default:
-					PubSubReceiver(s.PubSub)
+					PubSubReceiver(s.PubSub, toggleList)
 				}
 			}
 		}()

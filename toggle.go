@@ -44,7 +44,7 @@ func SetFeatureStatus(featureSignature, featureStatus string) (err error) {
 	fullSignature := GetFullFeatureSignature(featureSignature)
 
 	if _, exists := featureList[fullSignature]; exists {
-		featureList[fullSignature].status = featureStatus
+		featureList[fullSignature].Status = featureStatus
 
 	} else {
 		err = fmt.Errorf("Feature toggle doesnt exist")
@@ -55,7 +55,7 @@ func SetFeatureStatus(featureSignature, featureStatus string) (err error) {
 func IsActive(featureSignature string) (active bool) {
 	fullSignature := GetFullFeatureSignature(featureSignature)
 
-	if feature, exists := featureList[fullSignature]; !exists || feature.status == FEATURE_OFF {
+	if feature, exists := featureList[fullSignature]; !exists || feature.Status == FEATURE_OFF {
 		active = false
 
 	} else {
@@ -64,11 +64,15 @@ func IsActive(featureSignature string) (active bool) {
 	return
 }
 
-type feature struct {
+type Feature struct {
 	name     string
-	status   string
+	Status   string
 	filter   func(...interface{}) bool
 	settings map[string]interface{}
+}
+
+func (s *Feature) UpdateStatus(newStatus string) {
+	s.Status = newStatus
 }
 
 const (
@@ -77,12 +81,12 @@ const (
 	FEATURE_FILTER = "filter:x:x"
 )
 
-var featureList map[string]*feature
+var featureList map[string]*Feature
 var namespace string
 var toggleEngine storageinterface.StorageEngine
 
 func Init(ns string, engine storageinterface.StorageEngine) {
-	featureList = make(map[string]*feature)
+	featureList = make(map[string]*Feature)
 	namespace = ns
 
 	if engine != nil {
@@ -93,7 +97,7 @@ func Init(ns string, engine storageinterface.StorageEngine) {
 	}
 }
 
-func ShowFeatures() map[string]*feature {
+func ShowFeatures() map[string]*Feature {
 	return featureList
 }
 
@@ -120,9 +124,9 @@ func RegisterFeatureWithStatus(featureSignature, statusValue string) (err error)
 	fullSignature := GetFullFeatureSignature(featureSignature)
 
 	if _, exists := featureList[fullSignature]; !exists {
-		featureList[fullSignature] = &feature{
+		featureList[fullSignature] = &Feature{
 			name:   fullSignature,
-			status: getFeatureStatusValue(fullSignature, statusValue),
+			Status: getFeatureStatusValue(fullSignature, statusValue),
 		}
 
 	} else {
