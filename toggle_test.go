@@ -13,6 +13,10 @@ var _ = Describe("toggle package", func() {
 		toggle.Init(controlNamespace, nil)
 	})
 
+	AfterEach(func() {
+		toggle.Close()
+	})
+
 	Describe("RegisterFeature Function", func() {
 		It("Should inject a new feature and return nil error", func() {
 			initialFeatureCount := len(toggle.ShowFeatures())

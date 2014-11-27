@@ -81,12 +81,17 @@ const (
 	FEATURE_FILTER = "filter:x:x"
 )
 
-var featureList map[string]*Feature
+var featureList map[string]*Feature = make(map[string]*Feature)
 var namespace string
 var toggleEngine storageinterface.StorageEngine
 
-func Init(ns string, engine storageinterface.StorageEngine) {
+func Close() {
 	featureList = make(map[string]*Feature)
+	namespace = ""
+	toggleEngine = nil
+}
+
+func Init(ns string, engine storageinterface.StorageEngine) {
 	namespace = ns
 
 	if engine != nil {

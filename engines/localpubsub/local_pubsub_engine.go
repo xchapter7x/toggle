@@ -27,6 +27,7 @@ type LocalPubSubEngine struct {
 }
 
 func (s *LocalPubSubEngine) Close() (err error) {
+	s.PubSub.Unsubscribe()
 	s.quit <- true
 	return
 }
