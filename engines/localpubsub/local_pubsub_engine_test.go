@@ -100,13 +100,14 @@ var _ = Describe("localpubsub package", func() {
 				BeforeEach(func() {
 					pubsubCounter = 0
 					origReceiver = localpubsub.PubSubReceiver
+					var once sync.Once
+					var internalFunction func() = func() {
+						defer wg.Done()
+						localpubsub.PubSubReceiver = origReceiver
+						pubsubCounter++
+					}
 					localpubsub.PubSubReceiver = func(s localpubsub.ReceiverInterface, toggleList map[string]*toggle.Feature) {
-						var once sync.Once
-						once.Do(func() {
-							defer wg.Done()
-							localpubsub.PubSubReceiver = origReceiver
-							pubsubCounter++
-						})
+						once.Do(internalFunction)
 					}
 				})
 
