@@ -101,16 +101,17 @@ var _ = Describe("localpubsub package", func() {
 					pubsubCounter = 0
 					origReceiver = localpubsub.PubSubReceiver
 					localpubsub.PubSubReceiver = func(s localpubsub.ReceiverInterface, toggleList map[string]*toggle.Feature) {
-						pubsubCounter++
-						if pubsubCounter <= wgGroupCount {
-							wg.Done()
-						}
+						var once sync.Once
+						once.Do(func() {
+							defer wg.Done()
+							localpubsub.PubSubReceiver = origReceiver
+							pubsubCounter++
+						})
 					}
 				})
 
 				AfterEach(func() {
 					pubsubCounter = 0
-					localpubsub.PubSubReceiver = origReceiver
 				})
 
 				It("Should call the embeded function within the go routine when close was not called", func() {
