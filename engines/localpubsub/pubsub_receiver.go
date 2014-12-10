@@ -7,11 +7,13 @@ import (
 	"github.com/xchapter7x/toggle"
 )
 
-type receiverInterface interface {
+type ReceiverInterface interface {
 	Receive() interface{}
 }
 
-func PubSubReceiver(s receiverInterface, toggleList map[string]*toggle.Feature) {
+type PSReceiver func(s ReceiverInterface, toggleList map[string]*toggle.Feature)
+
+var PubSubReceiver PSReceiver = func(s ReceiverInterface, toggleList map[string]*toggle.Feature) {
 	switch n := s.Receive().(type) {
 	case redis.Message:
 		toggleList[n.Channel].UpdateStatus(string(n.Data[:]))

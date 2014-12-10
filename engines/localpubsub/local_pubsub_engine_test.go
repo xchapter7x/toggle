@@ -1,8 +1,11 @@
 package localpubsub_test
 
 import (
+	"sync"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/xchapter7x/toggle"
 	"github.com/xchapter7x/toggle/engines/localengine"
 	"github.com/xchapter7x/toggle/engines/localpubsub"
 )
@@ -48,7 +51,7 @@ func failureGetenvMock(fs string) (status string) {
 
 var _ = Describe("localpubsub package", func() {
 	Describe("localpubsub struct", func() {
-		Describe("GetFeatureStatusValue function", func() {
+		Context("GetFeatureStatusValue function", func() {
 			var localEngineFailureMock, localEngineSuccessMock *localengine.LocalEngine
 			var engine *localpubsub.LocalPubSubEngine
 
@@ -86,6 +89,40 @@ var _ = Describe("localpubsub package", func() {
 				engine.StartSubscriptionListener(nil)
 				_, err := engine.GetFeatureStatusValue("")
 				Ω(err).ShouldNot(BeNil())
+			})
+			Context("go routine in StartSubscriptionListener", func() {
+				var (
+					pubsubCounter int                    = 0
+					origReceiver  localpubsub.PSReceiver = nil
+					wg            sync.WaitGroup
+					wgGroupCount  int = 1
+				)
+				BeforeEach(func() {
+					pubsubCounter = 0
+					origReceiver = localpubsub.PubSubReceiver
+					localpubsub.PubSubReceiver = func(s localpubsub.ReceiverInterface, toggleList map[string]*toggle.Feature) {
+						pubsubCounter++
+						if pubsubCounter <= wgGroupCount {
+							wg.Done()
+						}
+					}
+				})
+
+				AfterEach(func() {
+					pubsubCounter = 0
+					localpubsub.PubSubReceiver = origReceiver
+				})
+
+				It("Should return non nil err on failed call", func() {
+					wg.Add(wgGroupCount)
+					engine = &localpubsub.LocalPubSubEngine{
+						LocalEngine: localEngineFailureMock,
+						PubSub:      &PubSubConnMock{},
+					}
+					engine.StartSubscriptionListener(nil)
+					wg.Wait()
+					Ω(pubsubCounter).Should(BeNumerically(">=", wgGroupCount))
+				})
 			})
 		})
 	})
