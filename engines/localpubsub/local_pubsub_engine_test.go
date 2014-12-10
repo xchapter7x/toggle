@@ -113,7 +113,7 @@ var _ = Describe("localpubsub package", func() {
 					localpubsub.PubSubReceiver = origReceiver
 				})
 
-				It("Should return non nil err on failed call", func() {
+				It("Should call the embeded function within the go routine when close was not called", func() {
 					wg.Add(wgGroupCount)
 					engine = &localpubsub.LocalPubSubEngine{
 						LocalEngine: localEngineFailureMock,
