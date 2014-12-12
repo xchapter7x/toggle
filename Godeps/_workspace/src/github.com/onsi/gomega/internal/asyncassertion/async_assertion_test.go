@@ -3,7 +3,6 @@ package asyncassertion_test
 import (
 	"errors"
 	"time"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/internal/asyncassertion"
@@ -66,8 +65,7 @@ var _ = Describe("Async Assertion", func() {
 
 				a.Should(HaveLen(11), "My description %d", 2)
 
-				Ω(len(arr)).Should(BeNumerically(">", 8))
-				Ω(len(arr)).Should(BeNumerically("<=", 10))
+				Ω(arr).Should(HaveLen(10))
 				Ω(failureMessage).Should(ContainSubstring("Timed out after"))
 				Ω(failureMessage).Should(ContainSubstring("<[]int | len:10"), "Should pass the correct value to the matcher message formatter.")
 				Ω(failureMessage).Should(ContainSubstring("My description 2"))
@@ -141,23 +139,6 @@ var _ = Describe("Async Assertion", func() {
 				Ω(failureMessage).Should(ContainSubstring("Error:"))
 				Ω(failureMessage).Should(ContainSubstring("bam"))
 				Ω(callerSkip).Should(Equal(4))
-			})
-		})
-
-		Context("Making an assertion without a registered fail handler", func() {
-			It("should panic", func() {
-				defer func() {
-					e := recover()
-					RegisterFailHandler(Fail)
-					if e == nil {
-						Fail("expected a panic to have occured")
-					}
-				}()
-
-				RegisterFailHandler(nil)
-				c := make(chan bool, 1)
-				c <- true
-				Eventually(c).Should(Receive())
 			})
 		})
 	})
@@ -274,22 +255,6 @@ var _ = Describe("Async Assertion", func() {
 				Ω(failureMessage).Should(ContainSubstring("Error:"))
 				Ω(failureMessage).Should(ContainSubstring("bam"))
 				Ω(callerSkip).Should(Equal(4))
-			})
-		})
-
-		Context("Making an assertion without a registered fail handler", func() {
-			It("should panic", func() {
-				defer func() {
-					e := recover()
-					RegisterFailHandler(Fail)
-					if e == nil {
-						Fail("expected a panic to have occured")
-					}
-				}()
-
-				RegisterFailHandler(nil)
-				c := make(chan bool)
-				Consistently(c).ShouldNot(Receive())
 			})
 		})
 	})

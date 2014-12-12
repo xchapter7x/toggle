@@ -1,14 +1,12 @@
 package integration_test
 
 import (
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
-
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("ginkgo convert", func() {
@@ -46,15 +44,7 @@ var _ = Describe("ginkgo convert", func() {
 		relPath, err := filepath.Rel(cwd, filepath.Join(tmpDir, "convert_fixtures"))
 		Ω(err).ShouldNot(HaveOccurred())
 
-		cmd := exec.Command(pathToGinkgo, "convert", relPath)
-		cmd.Env = os.Environ()
-		for i, env := range cmd.Env {
-			if strings.HasPrefix(env, "PATH") {
-				cmd.Env[i] = cmd.Env[i] + ":" + filepath.Dir(pathToGinkgo)
-				break
-			}
-		}
-		err = cmd.Run()
+		err = exec.Command(pathToGinkgo, "convert", relPath).Run()
 		Ω(err).ShouldNot(HaveOccurred())
 	})
 

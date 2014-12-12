@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/xchapter7x/goutil/unpack"
+	"github.com/xchapter7x/goutil"
 	"github.com/xchapter7x/toggle"
 	"github.com/xchapter7x/toggle/engines/localengine"
 )
@@ -25,7 +25,7 @@ func main() {
 	toggle.RegisterFeature("test")
 	f := toggle.Flip("test", TestA, TestB, "argstring")
 	var output string
-	unpack.Unpack(f, &output)
+	goutil.Unpack(f, &output)
 	fmt.Println(output)
 
 }

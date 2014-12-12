@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/xchapter7x/goutil"
 	"github.com/xchapter7x/toggle/engines/localengine"
 	"github.com/xchapter7x/toggle/engines/storageinterface"
 )
@@ -29,6 +30,12 @@ func getActivePointer(flg string, defaultFeature, newFeature interface{}) (activ
 	} else {
 		activePointer = defaultFeature
 	}
+	return
+}
+
+func FlipP(flg string, responseInterfaceArray []interface{}, defaultFeature, newFeature interface{}, iargs ...interface{}) (err error) {
+	res := Flip(flg, defaultFeature, newFeature, iargs...)
+	err = goutil.UnpackArray(res, responseInterfaceArray)
 	return
 }
 

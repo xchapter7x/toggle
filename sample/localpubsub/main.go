@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/garyburd/redigo/redis"
-	"github.com/xchapter7x/goutil/unpack"
+	"github.com/xchapter7x/goutil"
 	"github.com/xchapter7x/toggle"
 	"github.com/xchapter7x/toggle/engines/localpubsub"
 )
@@ -36,12 +36,12 @@ func main() {
 	toggle.RegisterFeature("test")
 	f := toggle.Flip("test", TestA, TestB, "argstring")
 	var output string
-	unpack.Unpack(f, &output)
+	goutil.Unpack(f, &output)
 	fmt.Println(output)
 	fmt.Println("publish state change")
 	c2.Do("PUBLISH", "NS_test", "true")
 	time.Sleep(1000 * time.Millisecond)
 	f = toggle.Flip("test", TestA, TestB, "argstring")
-	unpack.Unpack(f, &output)
+	goutil.Unpack(f, &output)
 	fmt.Println(output)
 }

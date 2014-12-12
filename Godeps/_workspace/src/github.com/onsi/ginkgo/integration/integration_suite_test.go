@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-
+	"strings"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
@@ -24,12 +24,10 @@ func TestIntegration(t *testing.T) {
 	RunSpecs(t, "Integration Suite")
 }
 
-var _ = SynchronizedBeforeSuite(func() []byte {
-	pathToGinkgo, err := gexec.Build("github.com/onsi/ginkgo/ginkgo")
+var _ = BeforeSuite(func() {
+	var err error
+	pathToGinkgo, err = gexec.Build("github.com/onsi/ginkgo/ginkgo")
 	Ω(err).ShouldNot(HaveOccurred())
-	return []byte(pathToGinkgo)
-}, func(computedPathToGinkgo []byte) {
-	pathToGinkgo = string(computedPathToGinkgo)
 })
 
 var _ = BeforeEach(func() {
@@ -43,7 +41,7 @@ var _ = AfterEach(func() {
 	Ω(err).ShouldNot(HaveOccurred())
 })
 
-var _ = SynchronizedAfterSuite(func() {}, func() {
+var _ = AfterSuite(func() {
 	gexec.CleanupBuildArtifacts()
 })
 
@@ -77,6 +75,12 @@ func copyIn(fixture string, destination string) {
 func ginkgoCommand(dir string, args ...string) *exec.Cmd {
 	cmd := exec.Command(pathToGinkgo, args...)
 	cmd.Dir = dir
+	cmd.Env = []string{}
+	for _, env := range os.Environ() {
+		if !strings.Contains(env, "GINKGO_REMOTE_REPORTING_SERVER") {
+			cmd.Env = append(cmd.Env, env)
+		}
+	}
 
 	return cmd
 }

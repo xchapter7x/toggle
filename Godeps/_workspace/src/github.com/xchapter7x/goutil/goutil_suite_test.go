@@ -1,4 +1,4 @@
-package unpack_test
+package goutil_test
 
 import (
 	"testing"

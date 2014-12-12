@@ -1,15 +1,13 @@
 package leafnodes
 
 import (
+	"github.com/onsi/ginkgo/types"
 	"math"
 	"time"
-
-	"github.com/onsi/ginkgo/types"
 )
 
 type benchmarker struct {
 	measurements map[string]*types.SpecMeasurement
-	orderCounter int
 }
 
 func newBenchmarker() *benchmarker {
@@ -45,7 +43,6 @@ func (b *benchmarker) getMeasurement(name string, smallestLabel string, largestL
 		measurement = &types.SpecMeasurement{
 			Name:          name,
 			Info:          computedInfo,
-			Order:         b.orderCounter,
 			SmallestLabel: smallestLabel,
 			LargestLabel:  largestLabel,
 			AverageLabel:  averageLabel,
@@ -53,7 +50,6 @@ func (b *benchmarker) getMeasurement(name string, smallestLabel string, largestL
 			Results:       make([]float64, 0),
 		}
 		b.measurements[name] = measurement
-		b.orderCounter++
 	}
 
 	return measurement

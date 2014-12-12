@@ -1,11 +1,9 @@
 package spec_test
 
 import (
-	"time"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gbytes"
+	"time"
 
 	. "github.com/onsi/ginkgo/internal/spec"
 
@@ -26,7 +24,6 @@ var _ = Describe("Spec", func() {
 		codeLocation types.CodeLocation
 		nodesThatRan []string
 		spec         *Spec
-		buffer       *gbytes.Buffer
 	)
 
 	newBody := func(text string, fail bool) func() {
@@ -80,7 +77,6 @@ var _ = Describe("Spec", func() {
 	}
 
 	BeforeEach(func() {
-		buffer = gbytes.NewBuffer()
 		failer = Failer.New()
 		codeLocation = codelocation.New(0)
 		nodesThatRan = []string{}
@@ -120,7 +116,7 @@ var _ = Describe("Spec", func() {
 					containers = append(containers, newContainer("container", flag))
 				}
 
-				spec := New(subject, containers, false)
+				spec := New(subject, containers)
 				Ω(spec.Pending()).Should(Equal(c.Pending), "Case %d: %#v", i, c)
 				Ω(spec.Focused()).Should(Equal(c.Focused), "Case %d: %#v", i, c)
 
@@ -133,7 +129,7 @@ var _ = Describe("Spec", func() {
 
 	Describe("Skip", func() {
 		It("should be skipped", func() {
-			spec := New(newIt("it node", noneFlag, false), containers(newContainer("container", noneFlag)), false)
+			spec := New(newIt("it node", noneFlag, false), containers(newContainer("container", noneFlag)))
 			Ω(spec.Skipped()).Should(BeFalse())
 			spec.Skip()
 			Ω(spec.Skipped()).Should(BeTrue())
@@ -143,12 +139,12 @@ var _ = Describe("Spec", func() {
 
 	Describe("IsMeasurement", func() {
 		It("should be true if the subject is a measurement node", func() {
-			spec := New(newIt("it node", noneFlag, false), containers(newContainer("container", noneFlag)), false)
+			spec := New(newIt("it node", noneFlag, false), containers(newContainer("container", noneFlag)))
 			Ω(spec.IsMeasurement()).Should(BeFalse())
 			Ω(spec.Summary("").IsMeasurement).Should(BeFalse())
 			Ω(spec.Summary("").NumberOfSamples).Should(Equal(1))
 
-			spec = New(newMeasure("measure node", noneFlag, false, 10), containers(newContainer("container", noneFlag)), false)
+			spec = New(newMeasure("measure node", noneFlag, false, 10), containers(newContainer("container", noneFlag)))
 			Ω(spec.IsMeasurement()).Should(BeTrue())
 			Ω(spec.Summary("").IsMeasurement).Should(BeTrue())
 			Ω(spec.Summary("").NumberOfSamples).Should(Equal(10))
@@ -157,8 +153,8 @@ var _ = Describe("Spec", func() {
 
 	Describe("Passed", func() {
 		It("should pass when the subject passed", func() {
-			spec := New(newIt("it node", noneFlag, false), containers(), false)
-			spec.Run(buffer)
+			spec := New(newIt("it node", noneFlag, false), containers())
+			spec.Run()
 
 			Ω(spec.Passed()).Should(BeTrue())
 			Ω(spec.Failed()).Should(BeFalse())
@@ -171,8 +167,8 @@ var _ = Describe("Spec", func() {
 		It("should be failed if the failure was panic", func() {
 			spec := New(newItWithBody("panicky it", func() {
 				panic("bam")
-			}), containers(), false)
-			spec.Run(buffer)
+			}), containers())
+			spec.Run()
 			Ω(spec.Passed()).Should(BeFalse())
 			Ω(spec.Failed()).Should(BeTrue())
 			Ω(spec.Summary("").State).Should(Equal(types.SpecStatePanicked))
@@ -181,8 +177,8 @@ var _ = Describe("Spec", func() {
 		})
 
 		It("should be failed if the failure was a timeout", func() {
-			spec := New(newItWithBody("sleepy it", func(done Done) {}), containers(), false)
-			spec.Run(buffer)
+			spec := New(newItWithBody("sleepy it", func(done Done) {}), containers())
+			spec.Run()
 			Ω(spec.Passed()).Should(BeFalse())
 			Ω(spec.Failed()).Should(BeTrue())
 			Ω(spec.Summary("").State).Should(Equal(types.SpecStateTimedOut))
@@ -192,8 +188,8 @@ var _ = Describe("Spec", func() {
 		It("should be failed if the failure was... a failure", func() {
 			spec := New(newItWithBody("failing it", func() {
 				failer.Fail("bam", codeLocation)
-			}), containers(), false)
-			spec.Run(buffer)
+			}), containers())
+			spec.Run()
 			Ω(spec.Passed()).Should(BeFalse())
 			Ω(spec.Failed()).Should(BeTrue())
 			Ω(spec.Summary("").State).Should(Equal(types.SpecStateFailed))
@@ -209,7 +205,6 @@ var _ = Describe("Spec", func() {
 					newContainer("outer container", noneFlag),
 					newContainer("inner container", noneFlag),
 				),
-				false,
 			)
 
 			Ω(spec.ConcatenatedString()).Should(Equal("outer container inner container it node"))
@@ -220,8 +215,8 @@ var _ = Describe("Spec", func() {
 		Context("with just an it", func() {
 			Context("that succeeds", func() {
 				It("should run the it and report on its success", func() {
-					spec := New(newIt("it node", noneFlag, false), containers(), false)
-					spec.Run(buffer)
+					spec := New(newIt("it node", noneFlag, false), containers())
+					spec.Run()
 					Ω(spec.Passed()).Should(BeTrue())
 					Ω(spec.Failed()).Should(BeFalse())
 					Ω(nodesThatRan).Should(Equal([]string{"it node"}))
@@ -230,8 +225,8 @@ var _ = Describe("Spec", func() {
 
 			Context("that fails", func() {
 				It("should run the it and report on its success", func() {
-					spec := New(newIt("it node", noneFlag, true), containers(), false)
-					spec.Run(buffer)
+					spec := New(newIt("it node", noneFlag, true), containers())
+					spec.Run()
 					Ω(spec.Passed()).Should(BeFalse())
 					Ω(spec.Failed()).Should(BeTrue())
 					Ω(spec.Summary("").Failure.Message).Should(Equal("it node"))
@@ -268,9 +263,8 @@ var _ = Describe("Spec", func() {
 							newAft("inner aft B", failingNodes["inner aft B"]),
 						),
 					),
-					false,
 				)
-				spec.Run(buffer)
+				spec.Run()
 			})
 
 			Context("that all pass", func() {
@@ -454,9 +448,8 @@ var _ = Describe("Spec", func() {
 							newAft("aft A", false),
 						),
 					),
-					false,
 				)
-				spec.Run(buffer)
+				spec.Run()
 
 				Ω(spec.Passed()).Should(BeTrue())
 				Ω(spec.Failed()).Should(BeFalse())
@@ -488,9 +481,8 @@ var _ = Describe("Spec", func() {
 							newAft("aft A", false),
 						),
 					),
-					false,
 				)
-				spec.Run(buffer)
+				spec.Run()
 
 				Ω(spec.Passed()).Should(BeFalse())
 				Ω(spec.Failed()).Should(BeTrue())
@@ -525,10 +517,9 @@ var _ = Describe("Spec", func() {
 					containernode.New("outer container", noneFlag, outerContainerCodeLocation),
 					containernode.New("inner container", noneFlag, innerContainerCodeLocation),
 				),
-				false,
 			)
 
-			spec.Run(buffer)
+			spec.Run()
 			Ω(spec.Passed()).Should(BeTrue())
 			summary = spec.Summary("suite id")
 		})
@@ -558,8 +549,8 @@ var _ = Describe("Spec", func() {
 		BeforeEach(func() {
 			spec = New(leafnodes.NewMeasureNode("measure node", func(b Benchmarker) {
 				b.RecordValue("a value", 7, "some info")
-			}, noneFlag, codeLocation, 4, failer, 0), containers(), false)
-			spec.Run(buffer)
+			}, noneFlag, codeLocation, 4, failer, 0), containers())
+			spec.Run()
 			Ω(spec.Passed()).Should(BeTrue())
 			summary = spec.Summary("suite id")
 		})
@@ -579,48 +570,6 @@ var _ = Describe("Spec", func() {
 			Ω(report.Name).Should(Equal("a value"))
 			Ω(report.Info).Should(Equal("some info"))
 			Ω(report.Results).Should(Equal([]float64{7, 7, 7, 7}))
-		})
-	})
-
-	Describe("When told to emit progress", func() {
-		It("should emit progress to the writer as it runs Befores, JustBefores, Afters, and Its", func() {
-			spec = New(
-				newIt("it node", noneFlag, false),
-				containers(
-					newContainer("outer container", noneFlag,
-						newBef("outer bef A", false),
-						newJusBef("outer jusbef A", false),
-						newAft("outer aft A", false),
-					),
-					newContainer("inner container", noneFlag,
-						newBef("inner bef A", false),
-						newJusBef("inner jusbef A", false),
-						newAft("inner aft A", false),
-					),
-				),
-				true,
-			)
-			spec.Run(buffer)
-
-			Ω(buffer).Should(gbytes.Say(`\[BeforeEach\] outer container`))
-			Ω(buffer).Should(gbytes.Say(`\[BeforeEach\] inner container`))
-			Ω(buffer).Should(gbytes.Say(`\[JustBeforeEach\] outer container`))
-			Ω(buffer).Should(gbytes.Say(`\[JustBeforeEach\] inner container`))
-			Ω(buffer).Should(gbytes.Say(`\[It\] it node`))
-			Ω(buffer).Should(gbytes.Say(`\[AfterEach\] inner container`))
-			Ω(buffer).Should(gbytes.Say(`\[AfterEach\] outer container`))
-		})
-
-		It("should emit progress to the writer as it runs Befores, JustBefores, Afters, and Measures", func() {
-			spec = New(
-				newMeasure("measure node", noneFlag, false, 2),
-				containers(),
-				true,
-			)
-			spec.Run(buffer)
-
-			Ω(buffer).Should(gbytes.Say(`\[Measure\] measure node`))
-			Ω(buffer).Should(gbytes.Say(`\[Measure\] measure node`))
 		})
 	})
 })

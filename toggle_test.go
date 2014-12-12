@@ -17,6 +17,27 @@ var _ = Describe("toggle package", func() {
 		toggle.Close()
 	})
 
+	Describe("Flip Function", func() {
+		flagname := "controlflag"
+		controlStringA := "controltest"
+		controlStringB := "controlB"
+		var testFuncA func(string) string = func(arg1 string) string {
+			return arg1
+		}
+		var testFuncB func(string) string = func(arg1 string) string {
+			return controlStringB
+		}
+
+		It("Should do something", func() {
+			var s string
+			toggle.RegisterFeature(flagname)
+			response := []interface{}{&s}
+			err := toggle.FlipP(flagname, response, testFuncA, testFuncB, controlStringA)
+			Expect(s).To(Equal(controlStringA))
+			Ω(err).Should(BeNil())
+		})
+	})
+
 	Describe("RegisterFeature Function", func() {
 		It("Should inject a new feature and return nil error", func() {
 			initialFeatureCount := len(toggle.ShowFeatures())

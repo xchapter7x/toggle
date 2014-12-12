@@ -1,0 +1,14 @@
+#!/bin/bash
+EXITCODE=0;
+WATERMARK=$2;
+COVEROUTPUT=`godep go test -cover $1`;
+echo ${COVEROUTPUT};
+
+COVERLEVELS=`echo ${COVEROUTPUT} | grep -oh "[0-9]\{1,3\}\.[0-9]\{1,3\}\%"`
+for COVERLEVEL in ${COVERLEVELS};do
+    echo ${COVERLEVEL} | tr "%" " ";
+    COVERLEVEL=${COVERLEVEL/.*};
+    echo "Coverage - ${COVERLEVEL}%";
+    echo "Watermark- ${WATERMARK}%";
+    if (( $COVERLEVEL < $WATERMARK )); then echo "failed"; (exit 1); fi
+done

@@ -7,11 +7,8 @@ import (
 )
 
 type WriterInterface interface {
-	io.Writer
-
 	Truncate()
 	DumpOut()
-	DumpOutWithHeader(header string)
 }
 
 type Writer struct {
@@ -57,15 +54,6 @@ func (w *Writer) DumpOut() {
 	w.lock.Lock()
 	defer w.lock.Unlock()
 	if !w.stream {
-		w.buffer.WriteTo(w.outWriter)
-	}
-}
-
-func (w *Writer) DumpOutWithHeader(header string) {
-	w.lock.Lock()
-	defer w.lock.Unlock()
-	if !w.stream && w.buffer.Len() > 0 {
-		w.outWriter.Write([]byte(header))
 		w.buffer.WriteTo(w.outWriter)
 	}
 }

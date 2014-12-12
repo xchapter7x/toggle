@@ -1,4 +1,4 @@
-package unpack
+package goutil
 
 import (
 	"fmt"
@@ -23,7 +23,6 @@ func UnpackArray(packedValues []interface{}, unpackedPointers []interface{}) (er
 }
 
 func mapPackedValuesToUnpackedPointers(packedValues []interface{}, unpackedPointers []interface{}) (err error) {
-
 	for i, packedValue := range packedValues {
 		ptrVal := reflect.ValueOf((unpackedPointers)[i])
 		ptrElem := ptrVal.Elem()
@@ -35,8 +34,9 @@ func mapPackedValuesToUnpackedPointers(packedValues []interface{}, unpackedPoint
 			ptrElem.Set(packedValueReflectValue)
 			(unpackedPointers)[i] = ptrElem.Interface()
 
-		} else {
+		} else if packedValueReflectValue.IsValid() {
 			err = fmt.Errorf("Incorrect pointer type %s != %s", ptrElemKind, packedValueReflectValueKind)
+
 		}
 	}
 	return
