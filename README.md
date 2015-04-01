@@ -3,6 +3,8 @@ toggle
 
 [![wercker status](https://app.wercker.com/status/9c11e691895a9782a234fcc9bb313819/m "wercker status")](https://app.wercker.com/project/bykey/9c11e691895a9782a234fcc9bb313819)
 
+[![GoDoc](http://godoc.org/github.com/xchapter7x/toggle?status.png)](http://godoc.org/github.com/xchapter7x/toggle)
+
 
 ## supports env_variable backed toggling. 
 ## It can also be updated via a pubsub interface (tested w/ redis)
