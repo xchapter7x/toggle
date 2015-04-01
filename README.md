@@ -85,6 +85,21 @@ func TestB(s string) (r string) {
 func main() {
 	toggle.Init("MAINTEST", nil)
 	toggle.RegisterFeature("test")
+	output := ""
+	_, err := tgl.Flag("test").
+			On(testB).
+			Off(testA).
+			Args("argstring").
+			Returns(&output).
+			Run()
+	fmt.Println(output)
+}
+
+// or
+
+func mainAlt() {
+	toggle.Init("MAINTEST", nil)
+	toggle.RegisterFeature("test")
 	f := toggle.Flip("test", TestA, TestB, "argstring")
 	var output string
 	unpack.Unpack(f, &output)
