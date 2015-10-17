@@ -27,6 +27,14 @@ build:
         code: |
           ./testCoverage ./... 50 
 
+    - script:
+        name: coveralls upload
+        code: |
+          go get github.com/axw/gocov/gocov
+          go get github.com/mattn/goveralls
+          GIT_BRANCH=$WERCKER_GIT_BRANCH
+          ./coverage --coveralls
+
     # Test if the project builds
     - script:
         name: go build
