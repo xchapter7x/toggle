@@ -5,6 +5,7 @@ toggle
 
 [![GoDoc](http://godoc.org/github.com/xchapter7x/toggle?status.png)](http://godoc.org/github.com/xchapter7x/toggle)
 
+[![CoverageStatus](https://coveralls.io/repos/xchapter7x/toggle/badge.svg?branch=HEAD&service=github)](https://coveralls.io/github/xchapter7x/toggle?branch=HEAD)
 
 ## supports env_variable backed toggling. 
 ## It can also be updated via a pubsub interface (tested w/ redis)
